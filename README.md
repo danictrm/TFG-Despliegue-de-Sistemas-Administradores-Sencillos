@@ -23,7 +23,7 @@ Archivos:
 
 ## Autenticación de doble factor (TOTP 2FA):
 - Solo se aplica a usuarios con rol `administrador`, el resto acceden directamente.
-- Ejecutamos el script `install_totp.sh` en el servidor web con permisos `root` o `sudo`.
+- Ejecutamos el script `install_totp.sh` en el servidor web con permisos `root` o `sudo` en la misma ruta que los demas archivos 2fa.
 ```bash
 sudo bash install_totp.sh
 ```
