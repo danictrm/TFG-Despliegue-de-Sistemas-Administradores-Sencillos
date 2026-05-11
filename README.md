@@ -12,3 +12,20 @@ sudo bash instalador_webmin.sh
 - Accedemos a `https://ip_servidor:10000`
 - Desde Webmin instalaremos las dependencias que necesite esa máquina (mysql, Mariadb, Apache2...)
 - Listo, configura todo desde el mismo panel y no te compliques la vida!
+
+## Monitorización:
+- Ejecutamos el script `instalador_monitorizacion.sh` en la maquina principal.
+```bash
+sudo bash instalador_monitorizacion.sh
+```
+- Accedemos al panel de monitorización en `http://ip_servidor:19999`
+- Listo, visualiza en tiempo real CPU, RAM, disco, red y servicios desde el navegador!
+
+## Autenticación de doble factor (TOTP 2FA):
+- Solo se aplica a usuarios con rol `administrador`, el resto acceden directamente.
+- Ejecutamos el script `install_totp.sh` en el servidor web con permisos `root` o `sudo`.
+```bash
+sudo bash install_totp.sh
+```
+- Los administradores deberán escanear el QR con Google Authenticator o Authy la primera vez que inicien sesión.
+- Listo, el acceso de administradores queda protegido con verificación en dos pasos!
