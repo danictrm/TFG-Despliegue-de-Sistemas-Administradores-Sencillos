@@ -14,7 +14,12 @@ sudo bash instalador_webmin.sh
 - Listo, configura todo desde el mismo panel y no te compliques la vida!
 
 ## Monitorización:
-
+ 
+Alertas a Telegram cuando un servicio cae o se recupera.
+ 
+## Archivos
+- `monitor_cron.php` → `/var/www/html/monitor_cron.php`
+- `instalar_cron.sh` — Instala el cron automáticamente
 
 ## Autenticación de doble factor (TOTP 2FA):
 - Solo se aplica a usuarios con rol `administrador`, el resto acceden directamente.
