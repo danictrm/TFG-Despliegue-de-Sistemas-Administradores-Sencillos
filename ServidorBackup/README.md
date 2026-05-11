@@ -1,8 +1,8 @@
-Aquí tienes el README mejorado con mejor estructura, claridad y formato:
 
-***
 
-# 🖥️ Guía de Configuración del Servidor
+
+
+# Guía de Configuración del Servidor
 
 ## Requisitos Previos
 
