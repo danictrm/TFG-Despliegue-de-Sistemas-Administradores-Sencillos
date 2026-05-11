@@ -17,6 +17,12 @@ if (empty($_SESSION['totp_setup_id'])) {
     header("Location: /empleados/login.php"); exit;
 }
 
+// Solo administradores llegan aquí
+if (($_SESSION['totp_setup_rol'] ?? '') !== 'administrador') {
+    session_destroy();
+    header("Location: /empleados/login.php"); exit;
+}
+
 $id_empleado = $_SESSION['totp_setup_id'];
 $nombre      = $_SESSION['totp_setup_nombre'];
 $usuario     = $_SESSION['totp_setup_usuario'];

@@ -9,6 +9,12 @@ if (empty($_SESSION['totp_pre_id']) || empty($_SESSION['totp_pre_secret'])) {
     header("Location: /empleados/login.php"); exit;
 }
 
+// Solo administradores llegan aquí
+if (($_SESSION['totp_pre_rol'] ?? '') !== 'administrador') {
+    session_destroy();
+    header("Location: /empleados/login.php"); exit;
+}
+
 $error    = '';
 $intentos = &$_SESSION['totp_intentos'];
 $intentos = $intentos ?? 0;

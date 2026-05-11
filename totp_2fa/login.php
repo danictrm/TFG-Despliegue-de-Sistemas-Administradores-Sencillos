@@ -19,20 +19,29 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $emp = $stmt->fetch();
 
     if ($emp && $password === $emp['password']) {
-        $_SESSION['totp_pre_id']      = $emp['id_empleado'];
-        $_SESSION['totp_pre_nombre']  = $emp['nombre'];
-        $_SESSION['totp_pre_usuario'] = $emp['usuario'];
-        $_SESSION['totp_pre_rol']     = $emp['rol'];
-        $_SESSION['totp_pre_secret']  = $emp['totp_secret'];
+        // Solo los administradores requieren 2FA
+        if ($emp['rol'] === 'administrador') {
+            $_SESSION['totp_pre_id']      = $emp['id_empleado'];
+            $_SESSION['totp_pre_nombre']  = $emp['nombre'];
+            $_SESSION['totp_pre_usuario'] = $emp['usuario'];
+            $_SESSION['totp_pre_rol']     = $emp['rol'];
+            $_SESSION['totp_pre_secret']  = $emp['totp_secret'];
 
-        if (empty($emp['totp_secret'])) {
-            $_SESSION['totp_setup_id']      = $emp['id_empleado'];
-            $_SESSION['totp_setup_nombre']  = $emp['nombre'];
-            $_SESSION['totp_setup_usuario'] = $emp['usuario'];
-            $_SESSION['totp_setup_rol']     = $emp['rol'];
-            header("Location: /empleados/setup_totp.php"); exit;
+            if (empty($emp['totp_secret'])) {
+                $_SESSION['totp_setup_id']      = $emp['id_empleado'];
+                $_SESSION['totp_setup_nombre']  = $emp['nombre'];
+                $_SESSION['totp_setup_usuario'] = $emp['usuario'];
+                $_SESSION['totp_setup_rol']     = $emp['rol'];
+                header("Location: /empleados/setup_totp.php"); exit;
+            } else {
+                header("Location: /empleados/verify_totp.php"); exit;
+            }
         } else {
-            header("Location: /empleados/verify_totp.php"); exit;
+            // Usuarios no administradores: acceso directo sin 2FA
+            $_SESSION['empleado']    = $emp['nombre'];
+            $_SESSION['id_empleado'] = $emp['id_empleado'];
+            $_SESSION['rol']         = $emp['rol'];
+            header("Location: /empleados/administracion.php"); exit;
         }
     } else {
         $error = 'Usuario o contraseña incorrectos.';
