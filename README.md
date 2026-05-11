@@ -14,12 +14,7 @@ sudo bash instalador_webmin.sh
 - Listo, configura todo desde el mismo panel y no te compliques la vida!
 
 ## Monitorización:
-- Ejecutamos el script `instalador_monitorizacion.sh` en la maquina principal.
-```bash
-sudo bash instalador_monitorizacion.sh
-```
-- Accedemos al panel de monitorización en `http://ip_servidor:19999`
-- Listo, visualiza en tiempo real CPU, RAM, disco, red y servicios desde el navegador!
+
 
 ## Autenticación de doble factor (TOTP 2FA):
 - Solo se aplica a usuarios con rol `administrador`, el resto acceden directamente.
