@@ -17,7 +17,7 @@ sudo bash instalador_webmin.sh
  
 Alertas a Telegram cuando un servicio cae o se recupera.
  
-## Archivos
+Archivos
 - `monitor_cron.php` → `/var/www/html/monitor_cron.php`
 - `instalar_cron.sh` — Instala el cron automáticamente
 
