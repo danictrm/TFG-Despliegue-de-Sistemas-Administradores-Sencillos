@@ -29,3 +29,4 @@ sudo bash install_totp.sh
 ```
 - Los administradores deberán escanear el QR con Google Authenticator o Authy la primera vez que inicien sesión.
 - Listo, el acceso de administradores queda protegido con verificación en dos pasos!
+**El acceso a empleados requiere de haber ejecutado el script de 2fa**
