@@ -29,7 +29,8 @@ apache2-bin \
 apache2-data \
 apache2-utils \
 apache2 \
-ssl-cert
+ssl-cert \
+php
 
 echo "habilitando servicio apache2..."
 systemctl enable apache2
