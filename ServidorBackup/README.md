@@ -35,12 +35,6 @@ Copia los siguientes scripts en `/usr/local/bin/` y asigna los permisos de ejecu
 | `setup_rsnapshot.sh` | `/usr/local/bin/` | `chmod +x` |
 | `restaurar_backup` | `/usr/local/bin/` | `chmod +x` |
 
-Puedes aplicar los permisos con:
-```bash
-sudo chmod +x /usr/local/bin/backup_inteligente
-sudo chmod +x /usr/local/bin/setup_rsnapshot.sh
-sudo chmod +x /usr/local/bin/restaurar_backup
-```
 
 ### 5. Instalación del entorno web
 En el **servidor**, coloca y ejecuta el script `resolv` para instalar las dependencias necesarias para la página web.
