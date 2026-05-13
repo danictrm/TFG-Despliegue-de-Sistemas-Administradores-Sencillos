@@ -94,34 +94,6 @@ CREATE TABLE IF NOT EXISTS solicitudes_clases (
     FOREIGN KEY (id_asignatura) REFERENCES asignaturas(id_asignatura)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
-INSERT INTO empleados VALUES
-(1,'Samuel','manager','Samuel Caparros Sanchez (profesor)','Matemáticas y Física','profesor','',NULL),
-(2,'Daniel','manager','Daniel Calvo Torralbo (Profesor)','Lengua','profesor','',NULL),
-(3,'Lucas','manager','Lucas Ortega Pickmans (profesor)','Ingles','profesor','',NULL),
-(4,'admin','manager','Administrador','','administrador','dctrmpqsn2.0@gmail.com','HYAQKT776RRKF565'),
-(9,'SAdmin','manager','Samuel Admin','','administrador','samuelcaparross@gmail.com','4Z5WRY2VXHKBXTXF'),
-(11,'DAdmin','manager','Daniel Admin','','administrador','manolomanoslargas@ejemplo.com','ILQY2QZLUZXOIZE2'),
-(12,'Ladmin','manager','Lucas Admin','','administrador','lucasortega0506@gmail.com','7SL27CPLTDOUNVTC');
-
-INSERT INTO asignaturas VALUES
-(1,'Matemáticas',1),(2,'Fisica',1),(3,'Lengua',2),(4,'Inglés',3);
-
-INSERT INTO clientes VALUES
-(1,'Samuel Caparrós Sánchez','655909272','samuelcaparross@gmail.com'),
-(2,'Fernando Martín Turiel','630909148','ejemplo1@sisoy.com'),
-(3,'Maria Sanchez','657483021','editor@wordpress.local'),
-(4,'Mikel Otaño Echave','651281309','jugadoresdeminecraft4@gmail.com');
-
-INSERT INTO clases VALUES
-(1,1,3,2,'2026-03-24'),(2,2,4,3,'2026-03-18');
-
-INSERT INTO fichajes VALUES
-(1,2,'entrada','2026-03-23 15:58:18'),(2,2,'salida','2026-03-23 15:58:19'),
-(3,4,'entrada','2026-05-09 11:33:35'),(4,4,'salida','2026-05-09 11:33:37');
-
-INSERT INTO solicitudes_clases VALUES
-(6,3,1,2,'2026-03-24','aprobada','2026-03-23 12:48:50'),
-(7,4,2,3,'2026-03-18','aprobada','2026-03-23 12:49:35');
 
 EOF
 
