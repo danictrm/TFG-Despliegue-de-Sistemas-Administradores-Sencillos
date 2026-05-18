@@ -1,130 +1,63 @@
-<?php
-/**
- * monitor_cron.php
- * Ejecutar con cron cada minuto:
- *   * * * * * /usr/bin/php /var/www/html/monitor_cron.php >> /var/www/html/monitor_cron.log 2>&1
- */
+#!/bin/bash
+# instalar_cron.sh
+# Instala dependencias, añade IDs de Telegram al monitor y configura el cron.
+# Uso: sudo bash instalar_cron.sh
 
-define('BOT_TOKEN',    '8522801732:AAGlyCjjUOSKJdj3_RmUlszfMtznZaZrrP8');
-define('ESTADOS_FILE', __DIR__ . '/estados.json');
+# ── Instalar dependencias ────────────────────────────────────────────────────
 
-$CHAT_IDS = [
-    '5647461703',  
-    '8765521821',   // Técnico 1
-    '5735929047',   // Técnico 2
-];
+echo "Instalando curl y php-curl..."
+sudo apt update 
+sudo apt install -y curl php-curl
 
-// ── Funciones de Telegram ────────────────────────────────────────────────────
+echo "✔ Dependencias instaladas."
+echo ""
 
-function telegram_alerta($texto) {
-    global $CHAT_IDS;
+# ── Ruta del script PHP ──────────────────────────────────────────────────────
 
-    $url = 'https://api.telegram.org/bot' . BOT_TOKEN . '/sendMessage';
+read -p "¿Dónde está guardado monitor_cron.php? (ej: /var/www/html/monitor_cron.php): " SCRIPT_PATH
 
-    foreach ($CHAT_IDS as $chat_id) {
-        $data = ['chat_id' => $chat_id, 'text' => $texto];
+if [ ! -f "$SCRIPT_PATH" ]; then
+    echo "❌ No se encontró $SCRIPT_PATH"
+    echo "   Asegúrate de subir monitor_cron.php antes de ejecutar este script."
+    exit 1
+fi
 
-        $ch = curl_init($url);
-        curl_setopt_array($ch, [
-            CURLOPT_POST           => true,
-            CURLOPT_POSTFIELDS     => http_build_query($data),
-            CURLOPT_RETURNTRANSFER => true,
-            CURLOPT_TIMEOUT        => 10,
-            CURLOPT_SSL_VERIFYPEER => true,
-        ]);
-        $response = curl_exec($ch);
-        $error    = curl_error($ch);
-        curl_close($ch);
+# ── Añadir nuevos Chat IDs de Telegram ──────────────────────────────────────
 
-        if ($error) {
-            echo "[" . date('H:i:s') . "] Error cURL Telegram (chat $chat_id): $error\n";
-        } else {
-            echo "[" . date('H:i:s') . "] Telegram enviado a $chat_id: $texto\n";
-        }
-    }
+echo ""
+echo "➕ ¿Quieres añadir nuevos Chat IDs de Telegram al monitor?"
+read -p "   (s/n): " AÑADIR_IDS
+
+if [[ "$AÑADIR_IDS" =~ ^[sS]$ ]]; then
+    while true; do
+        read -p "   Introduce un Chat ID (o deja vacío para terminar): " NUEVO_ID
+        [ -z "$NUEVO_ID" ] && break
+
+        # Comprueba si ya existe en el archivo
+        if grep -q "'$NUEVO_ID'" "$SCRIPT_PATH"; then
+            echo "   ⚠️  El ID $NUEVO_ID ya estaba en el archivo. Se omite."
+        else
+            # Lo inserta justo antes del cierre del array $CHAT_IDS
+            sed -i "/^\];/i\\    '$NUEVO_ID'," "$SCRIPT_PATH"
+            echo "   ✔ ID $NUEVO_ID añadido."
+        fi
+    done
+fi
+
+# ── Configurar crontab ───────────────────────────────────────────────────────
+
+CRON_LINE="* * * * * php $SCRIPT_PATH >> ${SCRIPT_PATH%.*}.log 2>&1"
+
+(crontab -l 2>/dev/null | grep -qF "php $SCRIPT_PATH") && {
+    echo ""
+    echo "✔ El cron ya estaba configurado. No se hizo ningún cambio."
+    exit 0
 }
 
-function cargar_estados() {
-    if (!file_exists(ESTADOS_FILE)) return [];
-    return json_decode(file_get_contents(ESTADOS_FILE), true) ?: [];
-}
+(crontab -l 2>/dev/null; echo "$CRON_LINE") | crontab -
 
-function guardar_estados($estados) {
-    file_put_contents(ESTADOS_FILE, json_encode($estados));
-}
-
-// ── Funciones de comprobación ────────────────────────────────────────────────
-
-function servicio_estado($nombre) {
-    $estado = trim(shell_exec("systemctl is-active $nombre 2>/dev/null"));
-    return $estado === "active";
-}
-
-function ufw_levantado() {
-    $conf = @file_get_contents('/etc/ufw/ufw.conf');
-    if ($conf === false) return false;
-    return strpos($conf, 'ENABLED=yes') !== false;
-}
-
-function estado_mysql_remoto($host, $user, $pass, $db) {
-    $dsn = "mysql:host=$host;dbname=$db;charset=utf8mb4";
-    $options = [
-        PDO::ATTR_ERRMODE            => PDO::ERRMODE_EXCEPTION,
-        PDO::ATTR_DEFAULT_FETCH_MODE => PDO::FETCH_ASSOC,
-        PDO::ATTR_TIMEOUT            => 3,
-    ];
-    try {
-        new PDO($dsn, $user, $pass, $options);
-        return true;
-    } catch (PDOException $e) {
-        return false;
-    }
-}
-
-// ── Lista de servicios ───────────────────────────────────────────────────────
-
-$servicios = [
-    'apache2' => 'Servicio Web',
-    'mysql'   => 'Base de Datos (Servidor externo)',
-    'postfix' => 'Servicio de Correo',
-    'ufw'     => 'Firewall UFW',
-    'ssh'     => 'SSH',
-    'webmin'  => 'Webmin',
-];
-
-// ── Comprobar y notificar ────────────────────────────────────────────────────
-
-$prev = cargar_estados();
-$curr = [];
-
-foreach ($servicios as $svc => $nombre) {
-    $activo = false;
-    try {
-        if ($svc === 'ufw') {
-            $activo = ufw_levantado();
-        } elseif ($svc === 'mysql') {
-            $activo = estado_mysql_remoto('10.20.26.150', 'webuser', 'manager', 'academia');
-        } else {
-            $activo = servicio_estado($svc);
-        }
-    } catch (Throwable $e) {
-        $activo = false;
-    }
-
-    $curr[$svc] = $activo ? 'activo' : 'inactivo';
-
-    echo "[" . date('H:i:s') . "] $nombre: " . $curr[$svc] . "\n";
-
-    if (!$activo) {
-        if (!isset($prev[$svc]) || $prev[$svc] === 'activo') {
-            telegram_alerta("⚠️ $nombre CAÍDO — " . date('H:i:s'));
-        }
-    } else {
-        if (isset($prev[$svc]) && $prev[$svc] === 'inactivo') {
-            telegram_alerta("✅ $nombre RECUPERADO — " . date('H:i:s'));
-        }
-    }
-}
-
-guardar_estados($curr);
-echo "[" . date('H:i:s') . "] Estados guardados.\n";
+echo ""
+echo "✔ Cron instalado correctamente:"
+echo "   $CRON_LINE"
+echo ""
+echo "Puedes verificarlo con: crontab -l"
