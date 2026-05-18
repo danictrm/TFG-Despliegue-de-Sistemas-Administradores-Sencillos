@@ -6,8 +6,8 @@
 # ── Instalar dependencias ────────────────────────────────────────────────────
 
 echo "📦 Instalando curl y php-curl..."
-apt-get update -qq
-apt-get install -y curl php-curl
+sudo apt update 
+sudo apt install -y curl php-curl
 
 echo "✔ Dependencias instaladas."
 echo ""
