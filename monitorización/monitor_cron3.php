@@ -6,31 +6,41 @@
  */
 
 define('BOT_TOKEN',    '8522801732:AAGlyCjjUOSKJdj3_RmUlszfMtznZaZrrP8');
-define('CHAT_ID',      '5647461703');
 define('ESTADOS_FILE', __DIR__ . '/estados.json');
+
+$CHAT_IDS = [
+    '5647461703',  
+    '8765521821',   // Técnico 1
+    '5735929047',   // Técnico 2
+];
 
 // ── Funciones de Telegram ────────────────────────────────────────────────────
 
 function telegram_alerta($texto) {
-    $url  = 'https://api.telegram.org/bot' . BOT_TOKEN . '/sendMessage';
-    $data = ['chat_id' => CHAT_ID, 'text' => $texto];
+    global $CHAT_IDS;
 
-    $ch = curl_init($url);
-    curl_setopt_array($ch, [
-        CURLOPT_POST           => true,
-        CURLOPT_POSTFIELDS     => http_build_query($data),
-        CURLOPT_RETURNTRANSFER => true,
-        CURLOPT_TIMEOUT        => 10,
-        CURLOPT_SSL_VERIFYPEER => true,
-    ]);
-    $response = curl_exec($ch);
-    $error    = curl_error($ch);
-    curl_close($ch);
+    $url = 'https://api.telegram.org/bot' . BOT_TOKEN . '/sendMessage';
 
-    if ($error) {
-        echo "[" . date('H:i:s') . "] Error cURL Telegram: $error\n";
-    } else {
-        echo "[" . date('H:i:s') . "] Telegram enviado: $texto\n";
+    foreach ($CHAT_IDS as $chat_id) {
+        $data = ['chat_id' => $chat_id, 'text' => $texto];
+
+        $ch = curl_init($url);
+        curl_setopt_array($ch, [
+            CURLOPT_POST           => true,
+            CURLOPT_POSTFIELDS     => http_build_query($data),
+            CURLOPT_RETURNTRANSFER => true,
+            CURLOPT_TIMEOUT        => 10,
+            CURLOPT_SSL_VERIFYPEER => true,
+        ]);
+        $response = curl_exec($ch);
+        $error    = curl_error($ch);
+        curl_close($ch);
+
+        if ($error) {
+            echo "[" . date('H:i:s') . "] Error cURL Telegram (chat $chat_id): $error\n";
+        } else {
+            echo "[" . date('H:i:s') . "] Telegram enviado a $chat_id: $texto\n";
+        }
     }
 }
 
@@ -50,7 +60,6 @@ function servicio_estado($nombre) {
     return $estado === "active";
 }
 
-// Lee /etc/ufw/ufw.conf directamente, sin necesitar sudo ni tty
 function ufw_levantado() {
     $conf = @file_get_contents('/etc/ufw/ufw.conf');
     if ($conf === false) return false;
