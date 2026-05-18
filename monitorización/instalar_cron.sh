@@ -3,7 +3,7 @@
 # Añade monitor_cron.php al crontab para ejecutarse cada minuto.
 # Uso: sudo bash instalar_cron.sh
 
-SCRIPT_PATH="/var/www/html/monitor_cron.php"
+read -p "donde quieres guardar el php de cron_monitorización, ej:/var/www/html/monitor_cron.php" SCRIPT_PATH
 
 # Comprobar que el archivo existe
 if [ ! -f "$SCRIPT_PATH" ]; then
